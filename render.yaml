@@ -1,10 +1,10 @@
 services:
   - type: web
     name: portfolio01
-    plan: free
+    env: static
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     routes:
       - type: rewrite
-        source: /*
-        destination: /index.html
+        source: "/*"
+        destination: "/index.html"
