@@ -1,11 +1,9 @@
 services:
-  - type: web
+  - type: static
     name: portfolio01
-    env: node
-    plan: free
+    env: static
     buildCommand: npm install && npm run build
     staticPublishPath: dist
-    healthCheckPath: /
     routes:
       - type: rewrite
         source: /*
