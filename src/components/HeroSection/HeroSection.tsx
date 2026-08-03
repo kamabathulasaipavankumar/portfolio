@@ -57,7 +57,7 @@ export const HeroSection = () => {
             transition: { duration: 0.8, ease: "easeOut" },
           }}
         >
-        Frontend Developer | IT Professional
+        Frontend Developer | Software Engineer @ Ninestars
         </motion.h2>
 
         <motion.p
@@ -70,8 +70,9 @@ export const HeroSection = () => {
             transition: { duration: 0.8, ease: "easeOut" },
           }}
         >
-      Experienced IT professional with 1+ years in HTML5, CSS3, JavaScript, React, Redux, 
-      Git. Skilled in debugging, performance optimization, and building responsive UIs.
+      2+ years building responsive, high-performance web apps with ReactJS, Next.js,
+      and modern JavaScript. Currently crafting AI-powered automation interfaces at
+      Ninestars, with a passion for mentoring and clean, accessible UI.
         </motion.p>
 
         <motion.div
@@ -84,9 +85,9 @@ export const HeroSection = () => {
             transition: { duration: 0.8, ease: "easeOut" },
           }}
         >
-          
+
           <Badge className="text-xs bg-pink-500">Problem Solving</Badge>
-          <Badge className="text-xs bg-pink-500">Decision Making</Badge>
+          <Badge className="text-xs bg-pink-500">Technical Mentorship</Badge>
           <Badge className="text-xs bg-pink-500">Critical Thinking</Badge>
         </motion.div>
       </motion.div> 

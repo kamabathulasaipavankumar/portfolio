@@ -4,36 +4,42 @@ import { Briefcase, Award, Users, Globe } from "lucide-react";
 export const CareerTimeline = () => {
   const careerEvents = [
     {
-      year: "July 2024 – Present",
-      title: "Frontend Developer",
-      subtitle: "AFORV Pvt Ltd, Bangalore",
+      year: "Nov 2025 – Present",
+      title: "Software Engineer",
+      subtitle: "Ninestars Information Technologies Pvt. Ltd., Bengaluru",
       description:
-        "Spearheaded development of Recruitment Management Software (RMS) with recruiter workflows, approvals, and candidate tracking. Built dashboards, data tables, approval pipelines, and real-time notifications using ReactJS & MUI. Integrated REST APIs and optimized performance with responsive layouts and client-side validations.",
+        "Contributing to the AOTM AI automation platform, building responsive user interfaces for AI-based document processing and automation. Mentoring junior developers on coding standards and debugging techniques, and conducting code reviews to improve code quality across the team.",
       icon: <Users className="h-4 w-4 mr-2 text-primary" />,
     },
-
+    {
+      year: "Jul 2024 – Nov 2025",
+      title: "Frontend Developer",
+      subtitle: "AFORV, Bengaluru",
+      description:
+        "Built responsive UI components with ReactJS, Next.js, MUI, Bootstrap, and Tailwind CSS across Recruitment, Medical, Education, Hospitality, and Retail domains. Integrated RESTful APIs, implemented state management with React hooks, and built custom dashboards, forms, and data tables with cross-browser, mobile-first responsive design. Tested UI with Jest and React Testing Library.",
+      icon: <Globe className="h-4 w-4 mr-2 text-primary" />,
+    },
     {
       year: "Jan 2024 – Jun 2024",
-      title: "Frontend Developer Intern",
+      title: "Frontend Developer Intern (Training & Development)",
       subtitle: "PODBIC, Bengaluru",
       description:
-        "Contributed to Distribution Management Software (DMS) project. Built Surgery Tracking, Sales & Logistics modules with ReactJS and REST APIs. Enhanced UI with interactive elements, optimized CRUD workflows, and maintained codebase with Git + GitHub best practices.",
+        "Completed intensive training in React, JavaScript ES6+, Next.js, GraphQL, Node.js, and MongoDB through hands-on workshops. Built real-world SPAs and component-driven applications using Webpack and npm, applying responsive design and Git version control workflows.",
       icon: <Globe className="h-4 w-4 mr-2 text-primary" />,
     },
     {
       year: "Dec 2021 – Aug 2023",
       title: "Master of Computer Applications (MCA)",
-      subtitle: "S.V.K.P & Dr. K.S. Raju Arts and Science College",
+      subtitle: "SVKP & Dr. K.S. Raju Arts and Science College",
       description:
-        "Graduated with 7.72 CGPA. Specialized in Computer Networks, Artificial Intelligence, and Core Java. Completed projects focusing on secure and scalable application development.",
+        "Master's degree in Computer Applications, Computer Science.",
       icon: <Award className="h-4 w-4 mr-2 text-primary" />,
     },
     {
       year: "Jun 2018 – Aug 2021",
-      title: "Bachelor of Science (B.Sc.)",
-      subtitle: "S.V.K.P & Dr. K.S. Raju Arts and Science College",
-      description:
-        "Graduated with 6.49 CGPA. Built strong foundation in programming, AI, and software concepts. Actively participated in technical programs and extra-curricular activities.",
+      title: "Bachelor's Degree",
+      subtitle: "SVKP & Dr. K.S. Raju Arts and Science College",
+      description: "Bachelor's degree in Mathematics and Computer Science.",
       icon: <Briefcase className="h-4 w-4 mr-2 text-primary" />,
     },
   ];

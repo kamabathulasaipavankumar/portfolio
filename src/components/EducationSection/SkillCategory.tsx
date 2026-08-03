@@ -5,9 +5,67 @@ import {
   CardContent,
 } from "../lightswind/card.tsx";
 import { Badge } from "../lightswind/badge";
-import { Progress } from "../lightswind/progress";
 import { motion, AnimatePresence } from "framer-motion";
-import { CountUp } from "../lightswind/count-up";
+
+const skillCategories = [
+  {
+    name: "Frontend",
+    skills: [
+      "HTML5",
+      "CSS3",
+      "JavaScript ES6+",
+      "ReactJS",
+      "Next.js",
+      "Responsive Design",
+      "Mobile-First Development",
+    ],
+  },
+  {
+    name: "UI Frameworks",
+    skills: [
+      "MUI (Material-UI)",
+      "Bootstrap",
+      "Tailwind CSS",
+      "UI/UX Principles",
+      "Web Accessibility Standards",
+    ],
+  },
+  {
+    name: "Tools & DevOps",
+    skills: [
+      "Git",
+      "GitHub",
+      "Webpack",
+      "npm",
+      "yarn",
+      "Browser DevTools",
+      "Debugging",
+      "Performance Optimization",
+    ],
+  },
+  {
+    name: "Testing & Quality",
+    skills: [
+      "Jest",
+      "React Testing Library",
+      "Cross-Browser Compatibility",
+      "Code Reviews",
+    ],
+  },
+  {
+    name: "Backend & APIs",
+    skills: ["RESTful APIs", "GraphQL", "Node.js", "MongoDB", "API Integration"],
+  },
+  {
+    name: "Methodologies",
+    skills: [
+      "Agile/Scrum",
+      "Technical Mentorship",
+      "Project-Based Learning",
+      "Curriculum Design",
+    ],
+  },
+];
 
 export default function ProfessionalProfile() {
   return (
@@ -24,91 +82,50 @@ export default function ProfessionalProfile() {
       }}
       viewport={{ once: true, amount: 0.2 }}
     >
-      {/* Skills Section */}
       <motion.div
         initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
         whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: 0.6, ease: "easeOut" }}
         viewport={{ once: true }}
-        className="your-child-class"
       >
-        {" "}
-        <h3 className="text-3xl font-bold mb-6">Core Skills</h3>
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Technical Skills</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                { name: "React.js / Next.js", level: 95 },
-                { name: "Node.js / Express", level: 75 },
-                { name: "TypeScript & JavaScript", level: 90 },
-                 { name: "HTML5, CSS3, TailwindCSS", level: 92 },
-                { name: "Database (MongoDB)", level: 88 },
-                { name: "Testing (Jest)", level: 70 },
-              ].map((skill, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                  viewport={{ once: true, amount: 0.8 }}
-                >
-                  <div
-                    className="flex items-center justify-between text-sm 
-                  font-medium mb-1"
-                  >
-                    <span>{skill.name}</span>
-                    <CountUp
-                      className="text-md "
-                      value={skill.level}
-                      suffix="%"
-                      duration={1.5}
-                      decimals={0}
-                      animationStyle="spring"
-                      colorScheme="primary"
-                    />
-                  </div>
-                  <Progress value={skill.level} />
-                </motion.div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Soft Skills</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              <AnimatePresence>
-                {[
-                  "Leadership",
-                  "Problem Solving",
-                  "Critical Thinking",
-                  "Agile Methodologies",
-                  "Mentorship",
-                  "Strategic Thinking",
-                  "Cross-Team Collaboration",
-                  "Effective Communication",
-                ].map((skill, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 10 }}
-                    viewport={{ once: true }}
-                  >
-                    <Badge className="bg-pink-500">{skill}</Badge>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </CardContent>
-          </Card>
+        <h3 className="text-3xl font-bold mb-6">Technical Skills</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {skillCategories.map((category, i) => (
+            <motion.div
+              key={category.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05, duration: 0.5 }}
+              viewport={{ once: true, amount: 0.6 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle size="sm">{category.name}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-wrap gap-2">
+                  <AnimatePresence>
+                    {category.skills.map((skill) => (
+                      <motion.div
+                        key={skill}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 200,
+                          damping: 10,
+                        }}
+                        viewport={{ once: true }}
+                      >
+                        <Badge className="bg-pink-500">{skill}</Badge>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
         </div>
       </motion.div>
-
-      {/* Rest of your component remains unchanged */}
     </motion.section>
   );
 }

@@ -33,42 +33,24 @@ export const EducationSection = () => {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Master of Computer Application</CardTitle>
+              <CardTitle>Master of Computer Applications (MCA)</CardTitle>
               <p className="text-sm text-muted-foreground">
-                S.V.K.P & Dr.K.S Raju arts and Science College — 2021 – 2023
+                SVKP & Dr. K.S. Raju Arts and Science College — Dec 2021 – Aug 2023
               </p>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-2">
-              <p>
-                Specialized in <strong>Computer Networks</strong>,
-               <strong> Artificial Intelligence</strong>, and 
-                <strong> Data Mining</strong>.
-              </p>
-              <ul className="list-disc list-inside space-y-1">
-               <li>Completed advanced projects in AI and Data Mining</li>
-                <li>Gained strong knowledge of Core Java and programming fundamentals</li>
-                <li>Maintained GPA of 7.72/10.0</li>
-              </ul>
+              <p>Major in Computer Science.</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>B.Sc. in Computer Science</CardTitle>
+              <CardTitle>Bachelor's Degree</CardTitle>
               <p className="text-sm text-muted-foreground">
-                Adikavi Nannaya University — 2018 – 2021
+                SVKP & Dr. K.S. Raju Arts and Science College — Jun 2018 – Aug 2021
               </p>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-2">
-            <p>
-            Gained strong foundation in <strong>Java</strong>, 
-            <strong> Artificial Intelligence</strong>, and 
-            <strong> Office Tools & Photoshop</strong>.
-            </p>
-            <ul className="list-disc list-inside space-y-1">
-            <li>Completed projects using Java and AI concepts</li>
-            <li>Learned Adobe Photoshop and MS Office applications</li>
-            <li>Maintained GPA of 6.59/10.0</li>
-            </ul>
+              <p>Major in Mathematics and Computer Science.</p>
             </CardContent>
           </Card>
         </motion.div>
