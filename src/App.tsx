@@ -1,151 +1,47 @@
-// App.jsx
-import { useState, useEffect } from "react";
-import "./App.css";
+import ReactLenis from "lenis/react";
+import { MotionConfig, useReducedMotion } from "framer-motion";
 import Header from "./components/Header/Header";
 import { HeroSection } from "./components/HeroSection/HeroSection";
-import StripedBackground from "./components/lightswind/StripedBackground";
 import { AboutSection } from "./components/AboutSection/AboutSection";
-import { ProjectsSection } from "./components/ProjectsSection/ProjectsSection";
 import { EducationSection } from "./components/EducationSection/EducationSection";
+import ProfessionalProfile from "./components/EducationSection/SkillCategory";
 import { CareerTimeline } from "./components/CareerSection/CareerTimeline";
+import { ProjectsSection } from "./components/ProjectsSection/ProjectsSection";
 import ConnectSection from "./components/ConnectSection/ConnectSection";
-import ReactLenis from "lenis/react";
-import Dock from "./components/lightswind/dock";
-import {
-  Home,
-  User,
-  GraduationCap,
-  Briefcase,
-  FolderKanban,
-  MessageCircle,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Background } from "./components/ui/Background";
+import { PageBackdrop } from "./components/ui/PageBackdrop";
 
 function App() {
-  const [showDock, setShowDock] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
-  // Track scroll direction
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY) {
-        // scrolling down -> show Dock
-        setShowDock(true);
-      } else {
-        // scrolling up -> hide Dock
-        setShowDock(false);
-      }
-
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
-
-  // Helper for smooth scroll
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
-
-  // Dock items
-  const dockItems = [
-    {
-      icon: <Home size={24} />,
-      label: "Home",
-      onClick: () => scrollToSection("home"),
-    },
-    {
-      icon: <User size={24} />,
-      label: "About",
-      onClick: () => scrollToSection("about"),
-    },
-    {
-      icon: <GraduationCap size={24} />,
-      label: "Education",
-      onClick: () => scrollToSection("education"),
-    },
-    {
-      icon: <Briefcase size={24} />,
-      label: "Career",
-      onClick: () => scrollToSection("career"),
-    },
-    {
-      icon: <FolderKanban size={24} />,
-      label: "Projects",
-      onClick: () => scrollToSection("projects"),
-    },
-    {
-      icon: <MessageCircle size={24} />,
-      label: "Connect",
-      onClick: () => scrollToSection("connect"),
-    },
-  ];
+  const reduceMotion = useReducedMotion();
 
   return (
-    <div className="bg-background min-h-screen flex items-center justify-center">
-      <StripedBackground className={"fixed z-0 blur-xs"} />
+    <MotionConfig reducedMotion="user">
+      <ReactLenis root options={{ lerp: 0.1, smoothWheel: !reduceMotion }}>
+        {/* Clips full-bleed decoration horizontally without creating a scroll container */}
+        <div className="relative overflow-x-clip">
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-full focus:bg-surface-strong focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink focus:shadow-lg"
+          >
+            Skip to content
+          </a>
 
-      <ReactLenis root>
-        <Header />
+          <Background />
+          <PageBackdrop />
+          <Header />
 
-        <div
-          className="w-full bg-transparent max-w-5xl px-4 my-30
-          flex items-center justify-center 
-          lg:rounded-3xl backdrop-blur-xl border-gray-100 dark:border-gray-900"
-        >
-          <div className="z-10">
-            {/* Give IDs to sections */}
-            <div id="home">
-              <HeroSection />
-            </div>
-            <div id="about">
-              <AboutSection />
-            </div>
-            <div id="education">
-              <EducationSection />
-            </div>
-            <div id="career">
-              <CareerTimeline />
-            </div>
-         
-            <div id="projects">
-              <ProjectsSection />
-            </div>
-               <div id="connect">
-              <ConnectSection />
-            </div>
-          </div>
+          <main id="main" className="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+            <HeroSection />
+            <AboutSection />
+            <EducationSection />
+            <ProfessionalProfile />
+            <CareerTimeline />
+            <ProjectsSection />
+            <ConnectSection />
+          </main>
         </div>
-
-        {/* Dock with smooth show/hide animation */}
-        <AnimatePresence>
-          {showDock && (
-            <motion.div
-              initial={{ y: 100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 100, opacity: 0 }}
-              transition={{ duration: 0.6, ease: "easeInOut" }}
-              className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[999]"
-            >
-              <Dock
-                items={dockItems}
-                position="bottom"
-                magnification={70}
-                baseItemSize={50}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
       </ReactLenis>
-
-      {/* <SmoothCursor /> */}
-    </div>
+    </MotionConfig>
   );
 }
 
