@@ -1,114 +1,161 @@
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "../lightswind/card.tsx";
-import { Badge } from "../lightswind/badge";
-import { Progress } from "../lightswind/progress";
-import { motion, AnimatePresence } from "framer-motion";
-import { CountUp } from "../lightswind/count-up";
+import { Code2, FlaskConical, Palette, Server, Workflow, Wrench } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { SectionHeading } from "../ui/SectionHeading";
+import { Stagger, StaggerItem } from "../ui/motion";
+import { TechLogos } from "./TechLogos";
+
+type SkillCategory = {
+  name: string;
+  icon: LucideIcon;
+  skills: string[];
+};
+
+const skillCategories: SkillCategory[] = [
+  {
+    name: "Frontend",
+    icon: Code2,
+    skills: [
+      "HTML5",
+      "CSS3",
+      "JavaScript ES6+",
+      "ReactJS",
+      "Next.js",
+      "Responsive Design",
+      "Mobile-First Development",
+    ],
+  },
+  {
+    name: "UI Frameworks",
+    icon: Palette,
+    skills: [
+      "MUI (Material-UI)",
+      "Bootstrap",
+      "Tailwind CSS",
+      "UI/UX Principles",
+      "Web Accessibility Standards",
+    ],
+  },
+  {
+    name: "Tools & DevOps",
+    icon: Wrench,
+    skills: [
+      "Git",
+      "GitHub",
+      "Webpack",
+      "npm",
+      "yarn",
+      "Browser DevTools",
+      "Debugging",
+      "Performance Optimization",
+    ],
+  },
+  {
+    name: "Testing & Quality",
+    icon: FlaskConical,
+    skills: [
+      "Jest",
+      "React Testing Library",
+      "Cross-Browser Compatibility",
+      "Code Reviews",
+    ],
+  },
+  {
+    name: "Backend & APIs",
+    icon: Server,
+    skills: ["RESTful APIs", "GraphQL", "Node.js", "MongoDB", "API Integration"],
+  },
+  {
+    name: "Methodologies",
+    icon: Workflow,
+    skills: [
+      "Agile/Scrum",
+      "Technical Mentorship",
+      "Project-Based Learning",
+      "Curriculum Design",
+    ],
+  },
+];
+
+// Core stack, as named in the About section ("My expertise lies in …").
+const primarySkills = new Set([
+  "ReactJS",
+  "Next.js",
+  "JavaScript ES6+",
+  "HTML5",
+  "CSS3",
+  "MUI (Material-UI)",
+  "Bootstrap",
+  "Tailwind CSS",
+]);
 
 export default function ProfessionalProfile() {
   return (
-    <motion.section
-      id="skills"
-      className="space-y-12"
-      initial={{ opacity: 0 }}
-      whileInView={{
-        opacity: 1,
-        transition: {
-          staggerChildren: 0.2,
-          delayChildren: 0.3,
-        },
-      }}
-      viewport={{ once: true, amount: 0.2 }}
-    >
-      {/* Skills Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
-        whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        viewport={{ once: true }}
-        className="your-child-class"
+    <section id="skills" aria-labelledby="skills-title" className="relative isolate py-12 sm:py-16 lg:py-20">
+
+      <SectionHeading
+        title={
+          <>
+            Technical <span className="text-gradient">Skills</span>
+          </>
+        }
+        subtitle={
+          <span className="block max-w-[30rem] text-base">
+            A collection of technologies and tools I work with to build modern, scalable and high-performance web
+            applications.
+          </span>
+        }
+        id="skills-title"
+        underline
+      />
+
+      <div className="mt-10 sm:mt-12">
+        <TechLogos />
+      </div>
+
+      <Stagger
+        as="ul"
+        className="mt-4 grid gap-4 sm:mt-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-5"
+        stagger={0.06}
       >
-        {" "}
-        <h3 className="text-3xl font-bold mb-6">Core Skills</h3>
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Technical Skills</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                { name: "React.js / Next.js", level: 95 },
-                { name: "Node.js / Express", level: 75 },
-                { name: "TypeScript & JavaScript", level: 90 },
-                 { name: "HTML5, CSS3, TailwindCSS", level: 92 },
-                { name: "Database (MongoDB)", level: 88 },
-                { name: "Testing (Jest)", level: 70 },
-              ].map((skill, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                  viewport={{ once: true, amount: 0.8 }}
-                >
-                  <div
-                    className="flex items-center justify-between text-sm 
-                  font-medium mb-1"
-                  >
-                    <span>{skill.name}</span>
-                    <CountUp
-                      className="text-md "
-                      value={skill.level}
-                      suffix="%"
-                      duration={1.5}
-                      decimals={0}
-                      animationStyle="spring"
-                      colorScheme="primary"
-                    />
-                  </div>
-                  <Progress value={skill.level} />
-                </motion.div>
-              ))}
-            </CardContent>
-          </Card>
+        {skillCategories.map(({ name, icon: Icon, skills }, i) => (
+          <StaggerItem key={name} as="li">
+            <article className="card card-hover group flex h-full flex-col overflow-hidden bg-surface-strong/80! p-5 backdrop-blur-xl sm:p-6">
+              {/* Corner orb + dot texture */}
+              <div
+                aria-hidden="true"
+                className={`absolute -top-10 -right-10 size-24 rounded-full bg-gradient-to-br transition-transform duration-500 group-hover:scale-110 ${
+                  i % 2 === 0
+                    ? "from-violet-300/60 via-fuchsia-200/30 to-indigo-200/20 dark:from-violet-500/30 dark:via-fuchsia-500/10 dark:to-indigo-500/10"
+                    : "from-sky-300/60 via-indigo-200/30 to-violet-200/20 dark:from-sky-500/30 dark:via-indigo-500/10 dark:to-violet-500/10"
+                }`}
+              />
+              <div aria-hidden="true" className="bg-dots absolute top-5 right-[4.25rem] h-11 w-12 opacity-80" />
+              <div aria-hidden="true" className="edge-glow" />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Soft Skills</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              <AnimatePresence>
-                {[
-                  "Leadership",
-                  "Problem Solving",
-                  "Critical Thinking",
-                  "Agile Methodologies",
-                  "Mentorship",
-                  "Strategic Thinking",
-                  "Cross-Team Collaboration",
-                  "Effective Communication",
-                ].map((skill, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 10 }}
-                    viewport={{ once: true }}
+              <div className="relative flex items-center gap-4">
+                <span className="grid size-12 shrink-0 place-items-center rounded-2xl border border-line bg-gradient-to-br from-white to-violet-50 text-brand shadow-[0_8px_20px_-12px_rgb(79_70_229/0.5)] transition-transform duration-300 group-hover:scale-105 dark:from-violet-500/20 dark:to-indigo-500/10">
+                  <Icon size={22} aria-hidden="true" />
+                </span>
+                <div>
+                  <h3 className="text-lg font-bold tracking-tight text-ink">{name}</h3>
+                  <span aria-hidden="true" className="bg-brand-gradient mt-1.5 block h-[3px] w-5 rounded-full" />
+                </div>
+              </div>
+
+              <ul className="relative mt-5 flex flex-wrap gap-2" aria-label={`${name} skills`}>
+                {skills.map((skill) => (
+                  <li
+                    key={skill}
+                    className={`chip px-3! py-1.5! ${primarySkills.has(skill) ? "chip-primary" : "bg-surface-strong/70!"}`}
                   >
-                    <Badge className="bg-pink-500">{skill}</Badge>
-                  </motion.div>
+                    {skill}
+                  </li>
                 ))}
-              </AnimatePresence>
-            </CardContent>
-          </Card>
-        </div>
-      </motion.div>
-
-      {/* Rest of your component remains unchanged */}
-    </motion.section>
+              </ul>
+            </article>
+          </StaggerItem>
+        ))}
+      </Stagger>
+    </section>
   );
 }
