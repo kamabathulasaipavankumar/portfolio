@@ -10,6 +10,7 @@ import { ProjectsSection } from "./components/ProjectsSection/ProjectsSection";
 import ConnectSection from "./components/ConnectSection/ConnectSection";
 import { Background } from "./components/ui/Background";
 import { PageBackdrop } from "./components/ui/PageBackdrop";
+import { ChatWidget } from "./components/Chat/ChatWidget";
 
 function App() {
   const reduceMotion = useReducedMotion();
@@ -39,6 +40,8 @@ function App() {
             <ProjectsSection />
             <ConnectSection />
           </main>
+
+          <ChatWidget />
         </div>
       </ReactLenis>
     </MotionConfig>
