@@ -440,3 +440,34 @@
     animation: none;
   }
 }
+
+/* ==========================================================================
+   Chat → section navigation highlight (added by src/components/Chat/sectionLinks.ts)
+   ========================================================================== */
+
+.section-highlight {
+  border-radius: 1.75rem;
+  animation: section-highlight 2.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes section-highlight {
+  0% {
+    box-shadow: 0 0 0 0 rgb(124 58 237 / 0), 0 0 0 0 rgb(79 70 229 / 0);
+  }
+  18% {
+    box-shadow: 0 0 0 2px rgb(124 58 237 / 0.45), 0 0 56px -6px rgb(79 70 229 / 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 2px rgb(124 58 237 / 0.3), 0 0 40px -10px rgb(79 70 229 / 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(124 58 237 / 0), 0 0 0 0 rgb(79 70 229 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-highlight {
+    animation: none;
+    box-shadow: 0 0 0 2px rgb(124 58 237 / 0.45);
+  }
+}
