@@ -1,17 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f7f7fc" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#060816" media="(prefers-color-scheme: dark)" />
+    <!-- Dark is the default theme; Header.tsx updates this when the visitor switches to light. -->
+    <meta name="theme-color" content="#060816" />
     <link rel="preload" as="image" href="/images/myphoto.jpg" fetchpriority="high" />
     <title>Sai Pavan Kumar - Frontend Developer</title>
     <script>
-      // Apply the saved theme before first paint to avoid a flash.
+      // Dark by default; switch to light before first paint only if the visitor chose it.
       try {
-        if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark");
+        if (localStorage.getItem("theme-preference") === "light") {
+          document.documentElement.classList.remove("dark");
+          document.querySelector('meta[name="theme-color"]').setAttribute("content", "#f7f7fc");
+        }
       } catch (e) {}
     </script>
   </head>
