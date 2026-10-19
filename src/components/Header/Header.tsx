@@ -33,11 +33,16 @@ const desktopItems = navItems.filter((item) => item.id !== "connect");
 
 type Theme = "light" | "dark";
 
+// Dark is the default. Only an explicit choice from the toggle is stored. (A new key: the old "theme"
+// key was written on every visit, so it can't tell a real choice from the old light default.)
+const THEME_KEY = "theme-preference";
+const THEME_COLOR: Record<Theme, string> = { dark: "#060816", light: "#f7f7fc" };
+
 function readStoredTheme(): Theme {
   try {
-    return localStorage.getItem("theme") === "dark" ? "dark" : "light";
+    return localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
   } catch {
-    return "light";
+    return "dark";
   }
 }
 
@@ -86,11 +91,7 @@ export default function Header() {
   // Theme sync
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
-    try {
-      localStorage.setItem("theme", theme);
-    } catch {
-      /* storage unavailable */
-    }
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLOR[theme]);
   }, [theme]);
 
   // Glass state on scroll
@@ -122,6 +123,11 @@ export default function Header() {
 
   const toggleTheme = () => {
     const next: Theme = theme === "dark" ? "light" : "dark";
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch {
+      /* storage unavailable */
+    }
     const apply = () => {
       document.documentElement.classList.toggle("dark", next === "dark");
       setTheme(next);
