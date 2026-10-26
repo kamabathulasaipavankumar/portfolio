@@ -11,6 +11,8 @@ const MAX_MESSAGES = 12;
 const MAX_MESSAGE_CHARS = 1_000;
 // Answers are 1–4 sentences; a small budget also keeps each request cheap against the tokens/minute limit.
 const MAX_COMPLETION_TOKENS = 350;
+// Budget for the single retry when a reply ends without any answer text.
+const EMPTY_RETRY_COMPLETION_TOKENS = 700;
 const UPSTREAM_TIMEOUT_MS = 30_000;
 // If Groq's rate limit frees up within this many seconds, wait and retry once instead of failing.
 const MAX_RETRY_WAIT_S = 6;
@@ -90,11 +92,32 @@ function parseMessages(body: unknown): ChatMessage[] | null {
   return parsed.at(-1)?.role === "user" ? parsed : null;
 }
 
+/** What the stream reported besides answer text, for diagnosing empty answers. */
+type StreamInfo = { finishReason: string | null; error: unknown };
+
 /** Turns Groq's OpenAI-style SSE stream into a stream of plain answer text. */
-function toTextStream(upstream: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+function toTextStream(upstream: ReadableStream<Uint8Array>, info: StreamInfo): ReadableStream<Uint8Array> {
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   let buffer = "";
+
+  const handleLine = (line: string, controller: TransformStreamDefaultController<Uint8Array>) => {
+    const data = line.trim();
+    if (!data.startsWith("data:")) return;
+    const payload = data.slice(5).trim();
+    if (payload === "[DONE]") return;
+    try {
+      const event = JSON.parse(payload);
+      // Groq can report failures inside an already-started (HTTP 200) stream.
+      if (event?.error) info.error = event.error;
+      const choice = event?.choices?.[0];
+      if (choice?.finish_reason) info.finishReason = choice.finish_reason;
+      const text = choice?.delta?.content;
+      if (typeof text === "string" && text) controller.enqueue(encoder.encode(text));
+    } catch {
+      // Ignore keep-alive or partial lines.
+    }
+  };
 
   return upstream.pipeThrough(
     new TransformStream<Uint8Array, Uint8Array>({
@@ -102,21 +125,31 @@ function toTextStream(upstream: ReadableStream<Uint8Array>): ReadableStream<Uint
         buffer += decoder.decode(chunk, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop() ?? "";
-        for (const line of lines) {
-          const data = line.trim();
-          if (!data.startsWith("data:")) continue;
-          const payload = data.slice(5).trim();
-          if (payload === "[DONE]") continue;
-          try {
-            const text = JSON.parse(payload)?.choices?.[0]?.delta?.content;
-            if (typeof text === "string" && text) controller.enqueue(encoder.encode(text));
-          } catch {
-            // Ignore keep-alive or partial lines.
-          }
-        }
+        for (const line of lines) handleLine(line, controller);
+      },
+      flush(controller) {
+        // The last event may arrive without a trailing newline.
+        handleLine(buffer + decoder.decode(), controller);
       },
     }),
   );
+}
+
+/** Resumes a text stream after its first chunk has already been read. */
+function resumeStream(first: Uint8Array, reader: ReadableStreamDefaultReader<Uint8Array>): ReadableStream<Uint8Array> {
+  return new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(first);
+    },
+    async pull(controller) {
+      const { done, value } = await reader.read();
+      if (done) controller.close();
+      else controller.enqueue(value);
+    },
+    cancel(reason) {
+      return reader.cancel(reason);
+    },
+  });
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -150,7 +183,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!messages) return json(400, `Send 1–${MAX_MESSAGES} messages of up to ${MAX_MESSAGE_CHARS} characters.`);
 
   const signal = AbortSignal.any([request.signal, AbortSignal.timeout(UPSTREAM_TIMEOUT_MS)]);
-  const callGroq = () =>
+  const callGroq = (maxTokens: number) =>
     fetch(GROQ_URL, {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -159,7 +192,7 @@ export async function POST(request: Request): Promise<Response> {
         messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
         stream: true,
         temperature: 0.4,
-        max_completion_tokens: MAX_COMPLETION_TOKENS,
+        max_completion_tokens: maxTokens,
         // gpt-oss is a reasoning model: keep thinking short and out of the response.
         reasoning_effort: "low",
         include_reasoning: false,
@@ -168,37 +201,56 @@ export async function POST(request: Request): Promise<Response> {
       signal,
     });
 
-  let upstream: Response;
-  try {
-    upstream = await callGroq();
-    const wait = Number(upstream.headers.get("retry-after"));
-    if (upstream.status === 429 && wait > 0 && wait <= MAX_RETRY_WAIT_S) {
-      await upstream.body?.cancel();
-      await new Promise((resolve) => setTimeout(resolve, wait * 1000));
-      upstream = await callGroq();
+  // A second attempt with a larger budget covers the rare case where the model ends without answer
+  // text (e.g. its hidden reasoning used up the token budget, or Groq failed inside the stream).
+  for (const maxTokens of [MAX_COMPLETION_TOKENS, EMPTY_RETRY_COMPLETION_TOKENS]) {
+    let upstream: Response;
+    try {
+      upstream = await callGroq(maxTokens);
+      const wait = Number(upstream.headers.get("retry-after"));
+      if (upstream.status === 429 && wait > 0 && wait <= MAX_RETRY_WAIT_S) {
+        await upstream.body?.cancel();
+        await new Promise((resolve) => setTimeout(resolve, wait * 1000));
+        upstream = await callGroq(maxTokens);
+      }
+    } catch (error) {
+      console.error("Groq request failed", error);
+      return json(502, "The assistant is unavailable right now. Please try again.");
     }
-  } catch (error) {
-    console.error("Groq request failed", error);
-    return json(502, "The assistant is unavailable right now. Please try again.");
-  }
 
-  if (!upstream.ok || !upstream.body) {
-    console.error("Groq error", upstream.status, await upstream.text().catch(() => ""));
-    if (upstream.status === 429) {
-      return json(429, "The assistant is busy right now. Please try again in a minute.", {
-        "Retry-After": upstream.headers.get("retry-after") ?? "60",
+    if (!upstream.ok || !upstream.body) {
+      console.error("Groq error", upstream.status, await upstream.text().catch(() => ""));
+      if (upstream.status === 429) {
+        return json(429, "The assistant is busy right now. Please try again in a minute.", {
+          "Retry-After": upstream.headers.get("retry-after") ?? "60",
+        });
+      }
+      return json(502, "The assistant is unavailable right now. Please try again.");
+    }
+
+    // Wait for the first piece of answer text before committing to a 200 streaming response.
+    const info: StreamInfo = { finishReason: null, error: null };
+    const reader = toTextStream(upstream.body, info).getReader();
+    let first: ReadableStreamReadResult<Uint8Array>;
+    try {
+      first = await reader.read();
+    } catch (error) {
+      console.error("Groq stream failed", error);
+      return json(502, "The assistant is unavailable right now. Please try again.");
+    }
+    if (!first.done) {
+      return new Response(resumeStream(first.value, reader), {
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+        },
       });
     }
-    return json(502, "The assistant is unavailable right now. Please try again.");
+    console.error("Groq returned no answer text", { maxTokens, finishReason: info.finishReason, error: info.error });
   }
 
-  return new Response(toTextStream(upstream.body), {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-store",
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
+  return json(502, "The assistant couldn't answer that just now. Please try again or rephrase your question.");
 }
 
 export function GET() {
